@@ -15,9 +15,17 @@ To run this demo:
 
 - Make sure the `cockroach` command is in your shell command line path.  You can download CockroachDB
 [here](https://www.cockroachlabs.com/docs/releases).
-- Make sure you can run the `zsh` shell
+- Make sure the `zsh` shell is available on your system in a standard location
 - Run the `comment_test_setup.sql` script
 - Press `RETURN` to step through the script
+
+## Cleanup After Running
+
+To clean up:
+
+- Kill the three `cockroach start` processes
+- Delete the three CockroachDB data directories (named node1, node2, and node3)
+- Delete comments.csv
 
 ## Sample Run with Output
 
