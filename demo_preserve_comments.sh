@@ -35,7 +35,7 @@ set -euo pipefail
 
 TEXT_WIDTH="100"
 STAGE=1
-TOTALSTAGES="3"
+TOTALSTAGES="9"
 BOLD=$(tput bold)
 NOBOLD=$(tput sgr0)
 
@@ -163,7 +163,7 @@ CMD=$(cat <<'EOFHERE'
   --background
 EOFHERE
 )
-do_stage "$TITLE" "$TEXT" "$CMD" ''
+do_stage "" "$TEXT" "$CMD" ''
 
 TEXT='Start the third node'
 CMD=$(cat <<'EOFHERE'
@@ -176,23 +176,23 @@ CMD=$(cat <<'EOFHERE'
   --background
 EOFHERE
 )
-do_stage "$TITLE" "$TEXT" "$CMD" ''
+do_stage "" "$TEXT" "$CMD" ''
 
 TEXT='Initialize the cluster'
 CMD=$(cat <<'EOFHERE'
  cockroach init --insecure --host=localhost:26257
 EOFHERE
 )
-do_stage "$TITLE" "$TEXT" "$CMD" ''
+do_stage "" "$TEXT" "$CMD" ''
 
 TEXT='Show the comments on all database objects'
 CMD=$(cat <<'EOFHERE'
  cockroach sql --insecure -e "
     SET allow_unsafe_internals = true;
-    SELECT * from system.comments ORDER BY type, object_id, sub_id"
+    SELECT * FROM system.comments ORDER BY type, object_id, sub_id"
 EOFHERE
 )
-do_stage "$TITLE" "$TEXT" "$CMD" '$MYSQL_VERSION'
+do_stage "" "$TEXT" "$CMD" '$MYSQL_VERSION'
 
 TITLE='Set up the demo schema with comments on database objects'
 TEXT='Load the schema'
@@ -206,10 +206,10 @@ TEXT='Show the comments on all database objects'
 CMD=$(cat <<'EOFHERE'
  cockroach sql --insecure -e "
     SET allow_unsafe_internals = true;
-    SELECT * from system.comments ORDER BY type, object_id, sub_id"
+    SELECT * FROM system.comments ORDER BY type, object_id, sub_id"
 EOFHERE
 )
-do_stage "$TITLE" "$TEXT" "$CMD" '$MYSQL_VERSION'
+do_stage "" "$TEXT" "$CMD" '$MYSQL_VERSION'
 
 TITLE='Save the comments to a CSV file'
 
@@ -226,7 +226,7 @@ CMD=$(cat <<'EOFHERE'
    cat comments.csv
 EOFHERE
 )
-do_stage "$TITLE" "$TEXT" "$CMD" '$MYSQL_VERSION'
+do_stage "" "$TEXT" "$CMD" '$MYSQL_VERSION'
 
 TITLE='Create the golden master backup'
 TEXT='Backup to a local directory'
@@ -258,10 +258,10 @@ TEXT='Show the comments on all database objects'
 CMD=$(cat <<'EOFHERE'
  cockroach sql --insecure -e "
     SET allow_unsafe_internals = true;
-    SELECT * from system.comments ORDER BY type, object_id, sub_id"
+    SELECT * FROM system.comments ORDER BY type, object_id, sub_id"
 EOFHERE
 )
-do_stage "$TITLE" "$TEXT" "$CMD" '$MYSQL_VERSION'
+do_stage "" "$TEXT" "$CMD" '$MYSQL_VERSION'
 
 TITLE='Make the saved comments available for IMPORT'
 TEXT='Copy CSV file to where it can be imported as a local file'
@@ -285,7 +285,7 @@ CMD=$(cat <<'EOFHERE'
  cockroach sql --insecure -d newdb -e "IMPORT INTO database_object_comments CSV DATA ('nodelocal://1/comments.csv') WITH skip = '1'"
 EOFHERE
 )
-do_stage "$TITLE" "$TEXT" "$CMD" '$MYSQL_VERSION'
+do_stage "" "$TEXT" "$CMD" '$MYSQL_VERSION'
 
 TEXT='Update the working table to match the name of the new database'
 CMD=$(cat <<'EOFHERE'
@@ -298,7 +298,17 @@ CMD=$(cat <<'EOFHERE'
      WHERE comment_type_name='Database';"
 EOFHERE
 )
-do_stage "$TITLE" "$TEXT" "$CMD" '$MYSQL_VERSION'
+do_stage "" "$TEXT" "$CMD" '$MYSQL_VERSION'
+
+TEXT='Show the updated working table with corrected database name'
+CMD=$(cat <<'EOFHERE'
+ cockroach sql --insecure -d newdb --format records -e "
+    SELECT * 
+    FROM database_object_comments
+    ORDER BY comment_type, object_name, object_sub_name"
+EOFHERE
+)
+do_stage "" "$TEXT" "$CMD" '$MYSQL_VERSION'
 
 TITLE='Restore the comments to the database objects'
 TEXT='Generate statements to set the comments, and execute them for the database objects'
@@ -314,10 +324,10 @@ TEXT='Show the comments on all database objects'
 CMD=$(cat <<'EOFHERE'
  cockroach sql --insecure -e "
     SET allow_unsafe_internals = true;
-    SELECT * from system.comments ORDER BY type, object_id, sub_id"
+    SELECT * FROM system.comments ORDER BY type, object_id, sub_id"
 EOFHERE
 )
-do_stage "$TITLE" "$TEXT" "$CMD" '$MYSQL_VERSION'
+do_stage "" "$TEXT" "$CMD" '$MYSQL_VERSION'
 
 echo
 echo "DEMO FINISHED"
