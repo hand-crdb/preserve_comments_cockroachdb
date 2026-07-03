@@ -9,6 +9,14 @@ If restoring just a database or a table, the comments are lost.
 This issue is tracked in GitHub issue 
 [#44396](https://github.com/cockroachdb/cockroach/issues/44396) "backupccl: backup/restore does not handle comments"
 
+This demo does the following:
+
+- Starts a 3-node CockroachDB cluster locally on your machine
+- Creates a demo database schema with comments on database objects
+- Stores the comments to a file
+- Backs up the original database and restores it to a different database
+- Reads the comments file and applies the comments to the database objects
+
 ## To Run
 
 To run this demo:
@@ -16,7 +24,7 @@ To run this demo:
 - Make sure the `cockroach` command is in your shell command line path.  You can download CockroachDB
 [here](https://www.cockroachlabs.com/docs/releases).
 - Make sure the `zsh` shell is available on your system in a standard location
-- Run the `comment_test_setup.sql` script
+- Run the `demo_preserve_comments.sh` script
 - Press `RETURN` to step through the script
 
 ## Cleanup After Running
